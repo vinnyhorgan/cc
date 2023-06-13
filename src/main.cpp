@@ -1,0 +1,69 @@
+#define SOL_ALL_SAFETIES_ON 1
+#include <sol/sol.hpp>
+
+#include <spdlog/spdlog.h>
+#include <raylib.h>
+#include <rlImGui.h>
+
+void log(int msgType, const char* text, va_list args)
+{
+    char message[1024];
+
+    vsprintf(message, text, args);
+
+    switch (msgType)
+    {
+        case LOG_INFO:
+            spdlog::info(message);
+            break;
+        case LOG_ERROR:
+            spdlog::error(message);
+            break;
+        case LOG_WARNING:
+            spdlog::warn(message);
+            break;
+        case LOG_DEBUG:
+            spdlog::debug(message);
+            break;
+    }
+}
+
+int main()
+{
+    sol::state lua;
+    lua.open_libraries(sol::lib::base);
+
+    lua.script_file("demo/main.lua");
+
+    SetTraceLogCallback(log);
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    InitWindow(800, 600, "Creative Coding by Vinny Horgan");
+    SetTargetFPS(60);
+
+    InitAudioDevice();
+
+    rlImGuiSetup(true);
+
+    while (!WindowShouldClose())
+    {
+        BeginDrawing();
+
+        ClearBackground(BLACK);
+
+        rlImGuiBegin();
+
+        ImGui::ShowDemoWindow();
+
+        rlImGuiEnd();
+
+        EndDrawing();
+    }
+
+    rlImGuiShutdown();
+
+    CloseAudioDevice();
+
+    CloseWindow();
+
+    return 0;
+}
