@@ -28,12 +28,60 @@ void log(int msgType, const char* text, va_list args)
     }
 }
 
+// lua api
+void guiBegin(std::string title)
+{
+    ImGui::Begin(title.c_str());
+}
+
+void guiEnd()
+{
+    ImGui::End();
+}
+
+void guiText(std::string text)
+{
+    ImGui::Text(text.c_str());
+}
+
+bool guiButton(std::string text)
+{
+    return ImGui::Button(text.c_str());
+}
+
+void guiEnableDocking()
+{
+    ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+}
+
+void guiDisableDocking()
+{
+    ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_DockingEnable;
+}
+
+void guiDockSpace()
+{
+    ImGui::DockSpaceOverViewport();
+}
+
 int main()
 {
     sol::state lua;
     lua.open_libraries(sol::lib::base);
 
     lua.script_file("demo/main.lua");
+
+    sol::function load = lua["load"];
+    sol::function update = lua["update"];
+    sol::function draw = lua["draw"];
+
+    lua["guiBegin"] = guiBegin;
+    lua["guiEnd"] = guiEnd;
+    lua["guiText"] = guiText;
+    lua["guiButton"] = guiButton;
+    lua["guiEnableDocking"] = guiEnableDocking;
+    lua["guiDisableDocking"] = guiDisableDocking;
+    lua["guiDockSpace"] = guiDockSpace;
 
     SetTraceLogCallback(log);
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
@@ -44,15 +92,19 @@ int main()
 
     rlImGuiSetup(true);
 
+    load();
+
     while (!WindowShouldClose())
     {
+        update();
+
         BeginDrawing();
 
         ClearBackground(BLACK);
 
         rlImGuiBegin();
 
-        ImGui::ShowDemoWindow();
+        draw();
 
         rlImGuiEnd();
 
