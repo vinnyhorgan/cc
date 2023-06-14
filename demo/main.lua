@@ -1,5 +1,9 @@
+value = 0
+value2 = 0
+checked = true
+
 function load()
-    guiEnableDocking();
+    gui.enableDocking();
 end
 
 function update()
@@ -7,15 +11,31 @@ function update()
 end
 
 function draw()
-    guiDockSpace();
+    gui.dockSpace();
 
-    guiBegin("Hello");
+    if gui.beginMainMenuBar() then
+        if gui.beginMenu("File") then
+            if gui.menuItem("Open") then
+                print("Open")
+            end
 
-    guiText("Helloooooo");
+            gui.endMenu()
+        end
 
-    if (guiButton("Click me")) then
+        gui.endMainMenuBar();
+    end
+
+    gui.begin("Hello");
+
+    value = gui.sliderInt("Value", value, 0, 100);
+    value2 = gui.sliderFloat("Value2", value2, 0, 100);
+    checked = gui.checkbox("Checked", checked);
+
+    gui.text("Helloooooo");
+
+    if (gui.button("Click me")) then
         print("Clicked!")
     end
 
-    guiEnd();
+    gui.endd();
 end
