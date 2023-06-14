@@ -86,6 +86,24 @@ std::string luoToLua(const std::string& code) {
     return result;
 }
 
+namespace graphics
+{
+    Texture loadTexture(std::string path)
+    {
+        return LoadTexture(path.c_str());
+    }
+
+    void unloadTexture(Texture texture)
+    {
+        UnloadTexture(texture);
+    }
+
+    void drawTexture(Texture texture, int posX, int posY)
+    {
+        DrawTexture(texture, posX, posY, WHITE);
+    }
+}
+
 namespace gui
 {
     void enableDocking()
@@ -113,9 +131,33 @@ namespace gui
         ImGui::DockSpaceOverViewport();
     }
 
-    void begin(std::string title)
+    bool begin(std::string title, bool open, sol::table flags)
     {
-        ImGui::Begin(title.c_str());
+        ImGuiWindowFlags windowFlags = 0;
+
+        if (flags["noTitleBar"].get_or(false))
+        {
+            windowFlags |= ImGuiWindowFlags_NoTitleBar;
+        }
+
+        if (flags["noResize"].get_or(false))
+        {
+            windowFlags |= ImGuiWindowFlags_NoResize;
+        }
+
+        if (flags["noMove"].get_or(false))
+        {
+            windowFlags |= ImGuiWindowFlags_NoMove;
+        }
+
+        if (flags["menuBar"].get_or(false))
+        {
+            windowFlags |= ImGuiWindowFlags_MenuBar;
+        }
+
+        ImGui::Begin(title.c_str(), &open, windowFlags);
+
+        return open;
     }
 
     void end()
@@ -141,6 +183,16 @@ namespace gui
     void endMainMenuBar()
     {
         ImGui::EndMainMenuBar();
+    }
+
+    bool beginMenuBar()
+    {
+        return ImGui::BeginMenuBar();
+    }
+
+    void endMenuBar()
+    {
+        ImGui::EndMenuBar();
     }
 
     bool beginMenu(std::string label)
@@ -177,6 +229,42 @@ namespace gui
         ImGui::Checkbox(label.c_str(), &value);
 
         return value;
+    }
+
+    std::string inputText(std::string label, std::string value)
+    {
+        char buffer[1024];
+
+        strcpy(buffer, value.c_str());
+
+        ImGui::InputText(label.c_str(), buffer, 1024);
+
+        return std::string(buffer);
+    }
+
+    void sameLine()
+    {
+        ImGui::SameLine();
+    }
+
+    void separator()
+    {
+        ImGui::Separator();
+    }
+
+    void beginChild(std::string label)
+    {
+        ImGui::BeginChild(label.c_str(), ImVec2(0, 0), true);
+    }
+
+    void endChild()
+    {
+        ImGui::EndChild();
+    }
+
+    void textColored(std::string text, int r, int g, int b, int a)
+    {
+        ImGui::TextColored(ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f), text.c_str());
     }
 }
 
@@ -221,6 +309,14 @@ int main()
     sol::function update = lua["update"];
     sol::function draw = lua["draw"];
 
+    sol::table graphics = lua.create_table();
+
+    graphics["loadTexture"] = graphics::loadTexture;
+    graphics["unloadTexture"] = graphics::unloadTexture;
+    graphics["drawTexture"] = graphics::drawTexture;
+
+    lua["graphics"] = graphics;
+
     sol::table gui = lua.create_table();
 
     gui["enableDocking"] = gui::enableDocking;
@@ -234,12 +330,20 @@ int main()
     gui["button"] = gui::button;
     gui["beginMainMenuBar"] = gui::beginMainMenuBar;
     gui["endMainMenuBar"] = gui::endMainMenuBar;
+    gui["beginMenuBar"] = gui::beginMenuBar;
+    gui["endMenuBar"] = gui::endMenuBar;
     gui["beginMenu"] = gui::beginMenu;
     gui["endMenu"] = gui::endMenu;
     gui["menuItem"] = gui::menuItem;
     gui["sliderInt"] = gui::sliderInt;
     gui["sliderFloat"] = gui::sliderFloat;
     gui["checkbox"] = gui::checkbox;
+    gui["inputText"] = gui::inputText;
+    gui["sameLine"] = gui::sameLine;
+    gui["separator"] = gui::separator;
+    gui["beginChild"] = gui::beginChild;
+    gui["endChild"] = gui::endChild;
+    gui["textColored"] = gui::textColored;
 
     lua["gui"] = gui;
 
