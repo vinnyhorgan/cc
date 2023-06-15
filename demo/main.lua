@@ -29,6 +29,13 @@ function load()
     test.value += 3
 
     print("Value is now " .. test.value .. " :)")
+
+    print(berlu:getSize()) -- handle segfault
+    print(berlu:getWidth())
+    print(berlu:getHeight())
+    print(berlu:getMipmaps())
+    print(berlu:getFilter())
+    print(berlu:getWrap())
 end
 
 function update()

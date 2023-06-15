@@ -200,7 +200,7 @@ int main()
     sol::function draw = lua["draw"];
 
     gui::registerGuiFunctions(lua);
-    graphics::registerGraphicsFunctions(lua);
+    graphics::registerGraphicsAPI(lua);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
