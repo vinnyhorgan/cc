@@ -30,12 +30,18 @@ function load()
 
     print("Value is now " .. test.value .. " :)")
 
-    print(berlu:getSize()) -- handle segfault
-    print(berlu:getWidth())
-    print(berlu:getHeight())
-    print(berlu:getMipmaps())
-    print(berlu:getFilter())
-    print(berlu:getWrap())
+    print(FilterMode.Point)
+
+    print("Size: " .. berlu:getSize()) -- handle segfault
+    print("Width: " .. berlu:getWidth())
+    print("Height: " .. berlu:getHeight())
+    print("Mipmaps: " .. berlu:getMipmaps())
+    print("Filter: " .. berlu:getFilter())
+    print("Wrap: " .. berlu:getWrap())
+
+    if (berlu:getFilter() != FilterMode.Bilinear) then
+        print("BRUHH")
+    end
 end
 
 function update()

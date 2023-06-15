@@ -22,61 +22,49 @@ namespace graphics
         return texture.mipmaps;
     }
 
-    std::string Image::getFilter()
+    FilterMode Image::getFilter()
     {
-        switch (filter)
+        return filter;
+    }
+
+    WrapMode Image::getWrap()
+    {
+        return wrap;
+    }
+
+    void Image::setFilter(FilterMode filter)
+    {
+        this->filter = filter;
+
+        if (filter == FilterMode::Point)
         {
-            case TEXTURE_FILTER_POINT:
-                return "point";
-            case TEXTURE_FILTER_BILINEAR:
-                return "bilinear";
+            SetTextureFilter(texture, TEXTURE_FILTER_POINT);
+        }
+        else if (filter == FilterMode::Bilinear)
+        {
+            SetTextureFilter(texture, TEXTURE_FILTER_BILINEAR);
         }
     }
 
-    std::string Image::getWrap()
+    void Image::setWrap(WrapMode wrap)
     {
-        switch (wrap)
-        {
-            case TEXTURE_WRAP_REPEAT:
-                return "repeat";
-            case TEXTURE_WRAP_CLAMP:
-                return "clamp";
-            case TEXTURE_WRAP_MIRROR_REPEAT:
-                return "mirror_repeat";
-            case TEXTURE_WRAP_MIRROR_CLAMP:
-                return "mirror_clamp";
-        }
-    }
+        this->wrap = wrap;
 
-    void Image::setFilter(std::string filter)
-    {
-        if (filter == "point")
+        if (wrap == WrapMode::Repeat)
         {
-            this->filter = TEXTURE_FILTER_POINT;
+            SetTextureWrap(texture, TEXTURE_WRAP_REPEAT);
         }
-        else if (filter == "bilinear")
+        else if (wrap == WrapMode::Clamp)
         {
-            this->filter = TEXTURE_FILTER_BILINEAR;
+            SetTextureWrap(texture, TEXTURE_WRAP_CLAMP);
         }
-    }
-
-    void Image::setWrap(std::string wrap)
-    {
-        if (wrap == "repeat")
+        else if (wrap == WrapMode::MirrorRepeat)
         {
-            this->wrap = TEXTURE_WRAP_REPEAT;
+            SetTextureWrap(texture, TEXTURE_WRAP_MIRROR_REPEAT);
         }
-        else if (wrap == "clamp")
+        else if (wrap == WrapMode::MirrorClamp)
         {
-            this->wrap = TEXTURE_WRAP_CLAMP;
-        }
-        else if (wrap == "mirror_repeat")
-        {
-            this->wrap = TEXTURE_WRAP_MIRROR_REPEAT;
-        }
-        else if (wrap == "mirror_clamp")
-        {
-            this->wrap = TEXTURE_WRAP_MIRROR_CLAMP;
+            SetTextureWrap(texture, TEXTURE_WRAP_MIRROR_CLAMP);
         }
     }
 
@@ -87,6 +75,20 @@ namespace graphics
 
     void registerGraphicsAPI(sol::state& lua)
     {
+        lua.new_enum<FilterMode>("FilterMode",
+        {
+            {"Point", FilterMode::Point},
+            {"Bilinear", FilterMode::Bilinear}
+        });
+
+        lua.new_enum<WrapMode>("WrapMode",
+        {
+            {"Repeat", WrapMode::Repeat},
+            {"Clamp", WrapMode::Clamp},
+            {"MirrorRepeat", WrapMode::MirrorRepeat},
+            {"MirrorClamp", WrapMode::MirrorClamp}
+        });
+
         sol::usertype<Image> image_type = lua.new_usertype<Image>("Image");
 
         image_type["getSize"] = &Image::getSize;
@@ -113,8 +115,8 @@ namespace graphics
         Image image;
 
         image.texture = LoadTexture(path.c_str());
-        image.filter = TEXTURE_FILTER_POINT;
-        image.wrap = TEXTURE_WRAP_CLAMP;
+        image.setFilter(FilterMode::Point);
+        image.setWrap(WrapMode::Clamp);
 
         return image;
     }

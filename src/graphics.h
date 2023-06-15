@@ -7,21 +7,35 @@
 
 namespace graphics
 {
+    enum FilterMode
+    {
+        Point,
+        Bilinear
+    };
+
+    enum WrapMode
+    {
+        Repeat,
+        Clamp,
+        MirrorRepeat,
+        MirrorClamp
+    };
+
     class Image
     {
     public:
         Texture texture;
-        TextureFilter filter;
-        TextureWrap wrap;
+        FilterMode filter;
+        WrapMode wrap;
 
         std::tuple<int, int> getSize();
         int getWidth();
         int getHeight();
         int getMipmaps();
-        std::string getFilter();
-        std::string getWrap();
-        void setFilter(std::string filter);
-        void setWrap(std::string wrap);
+        FilterMode getFilter();
+        WrapMode getWrap();
+        void setFilter(FilterMode filter);
+        void setWrap(WrapMode wrap);
         void unload();
     };
 
