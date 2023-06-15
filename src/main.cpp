@@ -4,6 +4,8 @@
 #include <spdlog/spdlog.h>
 #include <raylib.h>
 #include <rlImGui.h>
+#include <imfilebrowser.h>
+#include <imgui_memory_editor.h>
 
 #include <string>
 
@@ -156,6 +158,8 @@ namespace graphics
         DrawTexture(texture, posX, posY, WHITE);
     }
 }
+
+ImGui::FileBrowser fileDialog;
 
 namespace gui
 {
@@ -319,6 +323,12 @@ namespace gui
     {
         ImGui::TextColored(ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f), text.c_str());
     }
+
+    void openFileDialog(std::string title)
+    {
+        fileDialog.SetTitle(title.c_str());
+        fileDialog.Open();
+    }
 }
 
 void log(int msgType, const char* text, va_list args)
@@ -365,6 +375,7 @@ int main()
     sol::function load = lua["load"];
     sol::function update = lua["update"];
     sol::function draw = lua["draw"];
+    sol::function fileDialogSelected = lua["fileDialogSelected"];
 
     sol::table graphics = lua.create_table();
 
@@ -401,6 +412,7 @@ int main()
     gui["beginChild"] = gui::beginChild;
     gui["endChild"] = gui::endChild;
     gui["textColored"] = gui::textColored;
+    gui["openFileDialog"] = gui::openFileDialog;
 
     lua["gui"] = gui;
 
@@ -425,6 +437,20 @@ int main()
         rlImGuiBegin();
 
         draw();
+
+        static MemoryEditor mem_edit_1;
+        static char data[0x10000];
+        size_t data_size = 0x10000;
+        mem_edit_1.DrawWindow("Memory Editor", data, data_size);
+
+        fileDialog.Display();
+
+        if (fileDialog.HasSelected())
+        {
+            fileDialogSelected(fileDialog.GetSelected().string());
+
+            fileDialog.ClearSelected();
+        }
 
         rlImGuiEnd();
 

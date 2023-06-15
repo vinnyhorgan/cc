@@ -74,8 +74,7 @@ function draw()
     if gui.beginMenuBar() then
         if gui.beginMenu("File") then
             if gui.menuItem("Open") then
-                print("Open")
-                checked = true
+                gui.openFileDialog("Random dialog")
             end
 
             gui.endMenu()
@@ -98,4 +97,8 @@ function draw()
     gui.endd();
 
     graphics.drawTexture(berlu, 100, 100);
+end
+
+function fileDialogSelected(file)
+    print("Selected file: " .. file)
 end
