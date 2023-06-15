@@ -65,8 +65,20 @@ end
 std::string luoToLua(const std::string& code) {
     std::string result = code;
 
+    size_t pos = result.find("import(\"");
+    while (pos != std::string::npos) {
+        size_t endpos = result.find("\")", pos + 8);
+        if (endpos != std::string::npos) {
+            std::string filename = result.substr(pos + 8, endpos - pos - 8);
+
+            std::string file_contents = LoadFileText(filename.c_str());
+            result.replace(pos, endpos - pos + 2, file_contents);
+        }
+        pos = result.find("import(\"", pos + 1);
+    }
+
     // Replace not equals
-    size_t pos = result.find("!=");
+    pos = result.find("!=");
     while (pos != std::string::npos) {
         result.replace(pos, 2, "~=");
         pos = result.find("!=", pos + 2);
@@ -159,7 +171,7 @@ namespace graphics
     }
 }
 
-ImGui::FileBrowser fileDialog;
+ImGui::FileBrowser fileDialog; // TODO add flag support
 
 namespace gui
 {
@@ -324,9 +336,15 @@ namespace gui
         ImGui::TextColored(ImVec4(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f), text.c_str());
     }
 
-    void openFileDialog(std::string title)
+    void openFileDialog(std::string title, std::string filter)
     {
+        if (filter == "")
+        {
+            filter = ".*";
+        }
+
         fileDialog.SetTitle(title.c_str());
+        fileDialog.SetTypeFilters({ filter });
         fileDialog.Open();
     }
 }
@@ -360,7 +378,7 @@ int main()
 
     sol::state lua;
 
-    lua.open_libraries(sol::lib::base, sol::lib::package, sol::lib::math, sol::lib::string, sol::lib::table);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::math, sol::lib::string);
 
     std::string main = LoadFileText("demo/main.lua");
 

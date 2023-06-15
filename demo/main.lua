@@ -3,6 +3,8 @@ value2 = 0
 checked = true
 name = "Andrew"
 
+import("demo/mod.lua")
+
 berlu = nil
 
 TestClass = Object:extend()
@@ -74,7 +76,7 @@ function draw()
     if gui.beginMenuBar() then
         if gui.beginMenu("File") then
             if gui.menuItem("Open") then
-                gui.openFileDialog("Random dialog")
+                gui.openFileDialog("Random dialog", "")
             end
 
             gui.endMenu()
