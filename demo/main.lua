@@ -5,10 +5,28 @@ name = "Andrew"
 
 berlu = nil
 
+TestClass = Object:extend()
+
+function TestClass:new()
+    self.value = 0
+end
+
+test = TestClass()
+
 function load()
     gui.enableDocking();
 
     berlu = graphics.loadTexture("assets/b.png");
+
+    print("Value " .. test.value .. " :(")
+
+    if test.value != 1 then
+        print("Yep, still a failure")
+    end
+
+    test.value += 3
+
+    print("Value is now " .. test.value .. " :)")
 end
 
 function update()
