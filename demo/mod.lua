@@ -1,3 +1,1 @@
-print("Hello from")
-print("Mod!")
-print("Bye bye!")
+print("Hello from mod!")

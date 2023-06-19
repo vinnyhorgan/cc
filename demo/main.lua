@@ -1,47 +1,15 @@
-value = 0
-value2 = 0
-checked = true
-name = "Andrew"
-
 import("demo/mod.lua")
 
-berlu = nil
-
-TestClass = Object:extend()
-
-function TestClass:new()
-    self.value = 0
-end
-
-test = TestClass()
+local berlu
+local roboto
+local canvas
 
 function load()
-    gui.enableDocking();
+    berlu = graphics.newImage("assets/b.png");
+    roboto = graphics.newFont("assets/Roboto-Regular.ttf", 32);
+    canvas = graphics.newCanvas(200, 200)
 
-    berlu = graphics.loadTexture("assets/b.png");
-
-    print("Value " .. test.value .. " :(")
-
-    if test.value != 1 then
-        print("Yep, still a failure")
-    end
-
-    test.value += 3
-
-    print("Value is now " .. test.value .. " :)")
-
-    print(FilterMode.Point)
-
-    print("Size: " .. berlu:getSize()) -- handle segfault
-    print("Width: " .. berlu:getWidth())
-    print("Height: " .. berlu:getHeight())
-    print("Mipmaps: " .. berlu:getMipmaps())
-    print("Filter: " .. berlu:getFilter())
-    print("Wrap: " .. berlu:getWrap())
-
-    if (berlu:getFilter() != FilterMode.Bilinear) then
-        print("BRUHH")
-    end
+    graphics.setFont(roboto)
 end
 
 function update()
@@ -49,71 +17,20 @@ function update()
 end
 
 function draw()
-    -- gui.dockSpace();
+    graphics.setCanvas(canvas)
 
-    if gui.beginMainMenuBar() then
-        if gui.beginMenu("File") then
-            if gui.menuItem("Open") then
-                print("Open")
-                checked = true
-            end
+    graphics.clear(255, 255, 255)
 
-            gui.endMenu()
-        end
+    graphics.setColor(255, 0, 0)
 
-        gui.endMainMenuBar();
-    end
+    graphics.rectangle(DrawMode.Fill, 10, 10, 50, 100)
 
-    if checked then
-        checked = gui.begin("Hello", checked, { noMove = true });
+    graphics.setColor(255, 255, 255)
 
-        value = gui.sliderInt("Value", value, 0, 100);
-        value2 = gui.sliderFloat("Value2", value2, 0, 100);
-        gui.separator();
-        checked = gui.checkbox("Checked", checked);
-        gui.separator();
-        name = gui.inputText("Name", name);
-        gui.separator();
-        gui.text("Helloooooo");
-        gui.sameLine();
+    graphics.setCanvas()
 
-        if (gui.button("Click me")) then
-            print("Clicked!")
-        end
+    graphics.draw(berlu, 0, 0)
+    graphics.print("VIVA LA FIGA", 0, 0)
 
-        gui.endd();
-    end
-
-    gui.begin("Tool", true, { menuBar = true })
-
-    if gui.beginMenuBar() then
-        if gui.beginMenu("File") then
-            if gui.menuItem("Open") then
-                gui.openFileDialog("Random dialog", "")
-            end
-
-            gui.endMenu()
-        end
-
-        gui.endMenuBar();
-    end
-
-    gui.textColored("fancy title", 255, 0, 0, 255)
-
-    gui.beginChild("Child");
-
-    gui.text("Helloooooo");
-    gui.text("Helloooooo");
-    gui.text("Helloooooo");
-    gui.text("Helloooooo");
-
-    gui.endChild();
-
-    gui.endd();
-
-    graphics.drawTexture(berlu, 100, 100);
-end
-
-function fileDialogSelected(file)
-    print("Selected file: " .. file)
+    graphics.draw(canvas, 100, 100)
 end
