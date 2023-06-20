@@ -131,8 +131,27 @@ namespace graphics
         bool hasUniform(std::string name);
         void send(std::string name, float value);
         void send(std::string name, bool value);
-        void send(std::string name, float x, float y, float z);
+        void send(std::string name, sol::table value);
         void send(std::string name, Image image);
+    };
+
+    class Camerac // bruh
+    {
+    public:
+        Camera2D camera;
+
+        std::string type();
+
+        void setTarget(int x, int y);
+        void setOffset(int x, int y);
+        void setRotation(float rotation);
+        void setZoom(float zoom);
+        std::tuple<int, int> getTarget();
+        std::tuple<int, int> getOffset();
+        float getRotation();
+        float getZoom();
+        std::tuple<int, int> getScreenToWorld(int x, int y);
+        std::tuple<int, int> getWorldToScreen(int x, int y);
     };
 
     // Functions
@@ -166,6 +185,7 @@ namespace graphics
     Image newImage(std::string filename);
     Canvas newCanvas(int width, int height);
     Shaderc newShader(std::string vertex, std::string fragment);
+    Camerac newCamera();
 
     // Graphics state
     std::tuple<int, int, int, int> getBackgroundColor();
@@ -182,6 +202,8 @@ namespace graphics
     void setFont(Fontc font);
     void setShader(Shaderc shader);
     void setShader();
+    void setCamera(Camerac camera);
+    void setCamera();
 
-    // TODO: Add particle system, camera and ideally video support
+    // TODO: Add particle system and ideally video support
 }

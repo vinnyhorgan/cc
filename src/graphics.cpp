@@ -246,15 +246,97 @@ namespace graphics
         SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &value, SHADER_UNIFORM_INT);
     }
 
-    void Shaderc::send(std::string name, float x, float y, float z)
+    void Shaderc::send(std::string name, sol::table value)
     {
-        Vector3 vector = {x, y, z};
-        SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &vector, SHADER_UNIFORM_VEC3);
+        if (value.size() == 2)
+        {
+            Vector2 vector2 = {value[1], value[2]};
+            SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &vector2, SHADER_UNIFORM_VEC2);
+        }
+        else if (value.size() == 3)
+        {
+            Vector3 vector3 = {value[1], value[2], value[3]};
+            SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &vector3, SHADER_UNIFORM_VEC3);
+        }
+        else if (value.size() == 4)
+        {
+            Vector4 vector4 = {value[1], value[2], value[3], value[4]};
+            SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &vector4, SHADER_UNIFORM_VEC4);
+        }
+        else if (value.size() == 16)
+        {
+            Matrix matrix = {
+                value[1], value[2], value[3], value[4],
+                value[5], value[6], value[7], value[8],
+                value[9], value[10], value[11], value[12],
+                value[13], value[14], value[15], value[16]
+            };
+
+            SetShaderValueMatrix(shader, GetShaderLocation(shader, name.c_str()), matrix);
+        }
     }
 
     void Shaderc::send(std::string name, Image image)
     {
         SetShaderValueTexture(shader, GetShaderLocation(shader, name.c_str()), image.texture);
+    }
+
+    // Camera
+    std::string Camerac::type()
+    {
+        return "Camera";
+    }
+
+    void Camerac::setTarget(int x, int y)
+    {
+        camera.target = {(float)x, (float)y};
+    }
+
+    void Camerac::setOffset(int x, int y)
+    {
+        camera.offset = {(float)x, (float)y};
+    }
+
+    void Camerac::setRotation(float rotation)
+    {
+        camera.rotation = rotation;
+    }
+
+    void Camerac::setZoom(float zoom)
+    {
+        camera.zoom = zoom;
+    }
+
+    std::tuple<int, int> Camerac::getTarget()
+    {
+        return {camera.target.x, camera.target.y};
+    }
+
+    std::tuple<int, int> Camerac::getOffset()
+    {
+        return {camera.offset.x, camera.offset.y};
+    }
+
+    float Camerac::getRotation()
+    {
+        return camera.rotation;
+    }
+
+    float Camerac::getZoom()
+    {
+        return camera.zoom;
+    }
+
+    std::tuple<int, int> Camerac::getScreenToWorld(int x, int y)
+    {
+        Vector2 vector2 = GetScreenToWorld2D({(float)x, (float)y}, camera);
+        return {vector2.x, vector2.y};
+    }
+
+    std::tuple<int, int> Camerac::getWorldToScreen(int x, int y)
+    {
+        Vector2 vector2 = GetWorldToScreen2D({(float)x, (float)y}, camera);
+        return {vector2.x, vector2.y};
     }
 
     // Functions
@@ -352,7 +434,21 @@ namespace graphics
         shader_type["type"] = &Shaderc::type;
         shader_type["unload"] = &Shaderc::unload;
         shader_type["hasUniform"] = &Shaderc::hasUniform;
-        shader_type["send"] = sol::overload(sol::resolve<void(std::string, float)>(&Shaderc::send), sol::resolve<void(std::string, bool)>(&Shaderc::send), sol::resolve<void(std::string, float, float, float)>(&Shaderc::send), sol::resolve<void(std::string, Image)>(&Shaderc::send));
+        shader_type["send"] = sol::overload(sol::resolve<void(std::string, float)>(&Shaderc::send), sol::resolve<void(std::string, bool)>(&Shaderc::send), sol::resolve<void(std::string, sol::table)>(&Shaderc::send), sol::resolve<void(std::string, Image)>(&Shaderc::send));
+
+        sol::usertype<Camerac> camera_type = lua.new_usertype<Camerac>("Camera");
+
+        camera_type["type"] = &Camerac::type;
+        camera_type["setTarget"] = &Camerac::setTarget;
+        camera_type["setOffset"] = &Camerac::setOffset;
+        camera_type["setRotation"] = &Camerac::setRotation;
+        camera_type["setZoom"] = &Camerac::setZoom;
+        camera_type["getTarget"] = &Camerac::getTarget;
+        camera_type["getOffset"] = &Camerac::getOffset;
+        camera_type["getRotation"] = &Camerac::getRotation;
+        camera_type["getZoom"] = &Camerac::getZoom;
+        camera_type["getScreenToWorld"] = &Camerac::getScreenToWorld;
+        camera_type["getWorldToScreen"] = &Camerac::getWorldToScreen;
 
         sol::table graphics = lua.create_table();
 
@@ -371,6 +467,7 @@ namespace graphics
         graphics["newImage"] = &newImage;
         graphics["newCanvas"] = &newCanvas;
         graphics["newShader"] = &newShader;
+        graphics["newCamera"] = &newCamera;
         graphics["getBackgroundColor"] = &getBackgroundColor;
         graphics["getColor"] = &getColor;
         graphics["getFont"] = &getFont;
@@ -380,6 +477,7 @@ namespace graphics
         graphics["setColor"] = sol::overload(sol::resolve<void(int, int, int)>(&setColor), sol::resolve<void(int, int, int, int)>(&setColor));
         graphics["setFont"] = &setFont;
         graphics["setShader"] = sol::overload(sol::resolve<void(Shaderc)>(&setShader), sol::resolve<void()>(&setShader));
+        graphics["setCamera"] = sol::overload(sol::resolve<void(Camerac)>(&setCamera), sol::resolve<void()>(&setCamera));
 
         lua["graphics"] = graphics;
     }
@@ -572,6 +670,17 @@ namespace graphics
         return shader;
     }
 
+    Camerac newCamera()
+    {
+        Camerac camera;
+        camera.camera.target = {0, 0};
+        camera.camera.offset = {0, 0};
+        camera.camera.rotation = 0;
+        camera.camera.zoom = 1;
+
+        return camera;
+    }
+
     std::tuple<int, int, int, int> getBackgroundColor()
     {
         return std::make_tuple(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
@@ -643,5 +752,15 @@ namespace graphics
     void setShader()
     {
         EndShaderMode();
+    }
+
+    void setCamera(Camerac camera)
+    {
+        BeginMode2D(camera.camera);
+    }
+
+    void setCamera()
+    {
+        EndMode2D();
     }
 }
