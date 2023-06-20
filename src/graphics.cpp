@@ -479,7 +479,7 @@ namespace graphics
         graphics["setShader"] = sol::overload(sol::resolve<void(Shaderc)>(&setShader), sol::resolve<void()>(&setShader));
         graphics["setCamera"] = sol::overload(sol::resolve<void(Camerac)>(&setCamera), sol::resolve<void()>(&setCamera));
 
-        lua["graphics"] = graphics;
+        lua["cc"]["graphics"] = graphics;
     }
 
     void circle(DrawMode mode, int x, int y, float radius)

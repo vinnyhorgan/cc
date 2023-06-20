@@ -127,7 +127,7 @@ namespace keyboard
         keyboard["isPressed"] = &isPressed;
         keyboard["isReleased"] = &isReleased;
 
-        lua["keyboard"] = keyboard;
+        lua["cc"]["keyboard"] = keyboard;
     }
 
     bool isDown(KeyboardKey key)

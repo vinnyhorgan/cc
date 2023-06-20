@@ -211,6 +211,8 @@ int main()
     sol::protected_function update = lua["update"];
     sol::protected_function draw = lua["draw"];
 
+    lua["cc"] = lua.create_table();
+
     gui::registerGuiAPI(lua);
     graphics::registerGraphicsAPI(lua);
     keyboard::registerKeyboardAPI(lua);

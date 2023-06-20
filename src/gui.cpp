@@ -39,7 +39,7 @@ namespace gui
         gui["textColored"] = gui::textColored;
         gui["openFileDialog"] = gui::openFileDialog;
 
-        lua["gui"] = gui;
+        lua["cc"]["gui"] = gui;
     }
 
     void updateFileDialog(sol::state& lua)
