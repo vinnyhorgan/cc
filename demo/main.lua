@@ -15,6 +15,9 @@ end
 function update(dt)
     if cc.keyboard.isDown(Key.Space) then
         print("YES")
+        res = cc.networking.httpGet("https://www.google.com")
+
+        print(res)
     end
 end
 
