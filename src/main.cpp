@@ -10,6 +10,7 @@
 
 #include "gui.h"
 #include "graphics.h"
+#include "keyboard.h"
 
 // lua classic library
 std::string classic = R"(
@@ -210,12 +211,14 @@ int main()
     sol::protected_function update = lua["update"];
     sol::protected_function draw = lua["draw"];
 
-    gui::registerGuiFunctions(lua);
+    gui::registerGuiAPI(lua);
     graphics::registerGraphicsAPI(lua);
+    keyboard::registerKeyboardAPI(lua);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
     SetTargetFPS(60);
+    SetExitKey(0);
 
     InitAudioDevice();
 
@@ -257,7 +260,7 @@ int main()
         }
         else
         {
-            result = update();
+            result = update(GetFrameTime());
 
             if (!result.valid()) {
                 sol::error err = result;

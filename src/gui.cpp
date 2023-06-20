@@ -8,7 +8,7 @@ ImGui::FileBrowser fileDialog; // TODO add flag support
 
 namespace gui
 {
-    void registerGuiFunctions(sol::state& lua)
+    void registerGuiAPI(sol::state& lua)
     {
         sol::table gui = lua.create_table();
 

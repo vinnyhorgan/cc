@@ -12,8 +12,10 @@ function load()
     graphics.setFont(roboto)
 end
 
-function update()
-
+function update(dt)
+    if keyboard.isDown(Key.Space) then
+        print("YES")
+    end
 end
 
 function draw()

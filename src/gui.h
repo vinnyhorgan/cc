@@ -4,8 +4,10 @@
 
 namespace gui
 {
+    // Functions
+
     // Utility
-    void registerGuiFunctions(sol::state& lua);
+    void registerGuiAPI(sol::state& lua);
     void updateFileDialog(sol::state& lua);
 
     // API
