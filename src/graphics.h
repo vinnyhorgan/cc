@@ -120,6 +120,21 @@ namespace graphics
         void setWrap(WrapMode wrap);
     };
 
+    class Shaderc // same issue...
+    {
+    public:
+        Shader shader;
+
+        std::string type();
+        void unload();
+
+        bool hasUniform(std::string name);
+        void send(std::string name, float value);
+        void send(std::string name, bool value);
+        void send(std::string name, float x, float y, float z);
+        void send(std::string name, Image image);
+    };
+
     // Functions
 
     // Utility
@@ -150,6 +165,7 @@ namespace graphics
     Fontc newFont(std::string filename, int size);
     Image newImage(std::string filename);
     Canvas newCanvas(int width, int height);
+    Shaderc newShader(std::string vertex, std::string fragment);
 
     // Graphics state
     std::tuple<int, int, int, int> getBackgroundColor();
@@ -164,6 +180,8 @@ namespace graphics
     void setColor(int r, int g, int b);
     void setColor(int r, int g, int b, int a);
     void setFont(Fontc font);
+    void setShader(Shaderc shader);
+    void setShader();
 
-    // TODO: Add particle system, camera, shaders and ideally video support
+    // TODO: Add particle system, camera and ideally video support
 }

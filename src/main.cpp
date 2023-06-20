@@ -1,4 +1,5 @@
 #define SOL_ALL_SAFETIES_ON 1
+#define SOL_SAFE_USERTYPE 1
 #include <sol/sol.hpp>
 
 #include <spdlog/spdlog.h>
@@ -179,6 +180,10 @@ void log(int msgType, const char* text, va_list args)
 
 int main()
 {
+    bool error = false;
+    std::string error_message;
+    bool copied = false;
+
     SetTraceLogCallback(log);
 
     sol::state lua;
@@ -189,15 +194,21 @@ int main()
 
     std::string transpiled = luoToLua(main);
 
-    std::string finalCode = classic + "\n" + transpiled;
+    lua.script(classic);
 
-    SaveFileText("debug.lua", const_cast<char*>(finalCode.c_str()));
+    sol::protected_function_result result = lua.safe_script(transpiled, sol::script_pass_on_error);
 
-    lua.script(finalCode);
+    if (!result.valid()) {
+        sol::error err = result;
+        spdlog::error("Error loading script: {}", err.what());
 
-    sol::function load = lua["load"];
-    sol::function update = lua["update"];
-    sol::function draw = lua["draw"];
+        error = true;
+        error_message = err.what();
+    }
+
+    sol::protected_function load = lua["load"];
+    sol::protected_function update = lua["update"];
+    sol::protected_function draw = lua["draw"];
 
     gui::registerGuiFunctions(lua);
     graphics::registerGraphicsAPI(lua);
@@ -210,25 +221,74 @@ int main()
 
     rlImGuiSetup(true);
 
-    load();
+    result = load();
+
+    if (!result.valid()) {
+        sol::error err = result;
+        spdlog::error("Error loading script: {}", err.what());
+
+        error = true;
+        error_message = err.what();
+    }
 
     while (!WindowShouldClose())
     {
-        update();
+        if (error)
+        {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+            {
+                SetClipboardText(error_message.c_str());
+                copied = true;
+            }
 
-        BeginDrawing();
+            BeginDrawing();
 
-        ClearBackground(BLACK);
+            ClearBackground(SKYBLUE);
 
-        rlImGuiBegin();
+            DrawText("Error: (click to copy to clipboard)", 10, 10, 20, WHITE);
+            DrawText(error_message.c_str(), 10, 40, 20, WHITE);
 
-        draw();
+            if (copied)
+            {
+                DrawText("Copied to clipboard!", 10, GetScreenHeight() - 30, 20, WHITE);
+            }
 
-        gui::updateFileDialog(lua);
+            EndDrawing();
+        }
+        else
+        {
+            result = update();
 
-        rlImGuiEnd();
+            if (!result.valid()) {
+                sol::error err = result;
+                spdlog::error("Error updating script: {}", err.what());
 
-        EndDrawing();
+                error = true;
+                error_message = err.what();
+            }
+
+            BeginDrawing();
+
+            ClearBackground(BLACK);
+
+            rlImGuiBegin();
+
+            result = draw();
+
+            if (!result.valid()) {
+                sol::error err = result;
+                spdlog::error("Error drawing script: {}", err.what());
+
+                error = true;
+                error_message = err.what();
+            }
+
+            gui::updateFileDialog(lua);
+
+            rlImGuiEnd();
+
+            EndDrawing();
+        }
     }
 
     rlImGuiShutdown();

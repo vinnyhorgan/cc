@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-Ideps/include -Wall -Wextra -pedantic -std=c++17 -O2
+CXXFLAGS=-Ideps/include -Wall -Wextra -pedantic -std=c++17 # -O2 messes up some error handling
 LDFLAGS=-Ldeps/lib -lenet -llua -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 SRCDIR=src

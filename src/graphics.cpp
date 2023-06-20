@@ -220,6 +220,43 @@ namespace graphics
         }
     }
 
+    // Shader
+    std::string Shaderc::type()
+    {
+        return "Shader";
+    }
+
+    void Shaderc::unload()
+    {
+        UnloadShader(shader);
+    }
+
+    bool Shaderc::hasUniform(std::string name)
+    {
+        return GetShaderLocation(shader, name.c_str()) != -1;
+    }
+
+    void Shaderc::send(std::string name, float value)
+    {
+        SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &value, SHADER_UNIFORM_FLOAT);
+    }
+
+    void Shaderc::send(std::string name, bool value)
+    {
+        SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &value, SHADER_UNIFORM_INT);
+    }
+
+    void Shaderc::send(std::string name, float x, float y, float z)
+    {
+        Vector3 vector = {x, y, z};
+        SetShaderValue(shader, GetShaderLocation(shader, name.c_str()), &vector, SHADER_UNIFORM_VEC3);
+    }
+
+    void Shaderc::send(std::string name, Image image)
+    {
+        SetShaderValueTexture(shader, GetShaderLocation(shader, name.c_str()), image.texture);
+    }
+
     // Functions
     void registerGraphicsAPI(sol::state &lua)
     {
@@ -310,6 +347,13 @@ namespace graphics
         canvas_type["setFilter"] = &Canvas::setFilter;
         canvas_type["setWrap"] = &Canvas::setWrap;
 
+        sol::usertype<Shaderc> shader_type = lua.new_usertype<Shaderc>("Shader");
+
+        shader_type["type"] = &Shaderc::type;
+        shader_type["unload"] = &Shaderc::unload;
+        shader_type["hasUniform"] = &Shaderc::hasUniform;
+        shader_type["send"] = sol::overload(sol::resolve<void(std::string, float)>(&Shaderc::send), sol::resolve<void(std::string, bool)>(&Shaderc::send), sol::resolve<void(std::string, float, float, float)>(&Shaderc::send), sol::resolve<void(std::string, Image)>(&Shaderc::send));
+
         sol::table graphics = lua.create_table();
 
         graphics["circle"] = &circle;
@@ -326,6 +370,7 @@ namespace graphics
         graphics["newFont"] = &newFont;
         graphics["newImage"] = &newImage;
         graphics["newCanvas"] = &newCanvas;
+        graphics["newShader"] = &newShader;
         graphics["getBackgroundColor"] = &getBackgroundColor;
         graphics["getColor"] = &getColor;
         graphics["getFont"] = &getFont;
@@ -334,6 +379,7 @@ namespace graphics
         graphics["setCanvas"] = sol::overload(sol::resolve<void(Canvas)>(&setCanvas), sol::resolve<void()>(&setCanvas));
         graphics["setColor"] = sol::overload(sol::resolve<void(int, int, int)>(&setColor), sol::resolve<void(int, int, int, int)>(&setColor));
         graphics["setFont"] = &setFont;
+        graphics["setShader"] = sol::overload(sol::resolve<void(Shaderc)>(&setShader), sol::resolve<void()>(&setShader));
 
         lua["graphics"] = graphics;
     }
@@ -518,6 +564,14 @@ namespace graphics
         return canvas;
     }
 
+    Shaderc newShader(std::string vertex, std::string fragment)
+    {
+        Shaderc shader;
+        shader.shader = LoadShader(vertex.c_str(), fragment.c_str());
+
+        return shader;
+    }
+
     std::tuple<int, int, int, int> getBackgroundColor()
     {
         return std::make_tuple(backgroundColor.r, backgroundColor.g, backgroundColor.b, backgroundColor.a);
@@ -579,5 +633,15 @@ namespace graphics
     void setFont(Fontc font)
     {
         currentFont = font.font;
+    }
+
+    void setShader(Shaderc shader)
+    {
+        BeginShaderMode(shader.shader);
+    }
+
+    void setShader()
+    {
+        EndShaderMode();
     }
 }
