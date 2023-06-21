@@ -231,7 +231,7 @@ int main()
     filesystem::registerFilesystemAPI(lua);
     data::registerDataAPI(lua);
 
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
+    SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
     SetTargetFPS(60);
     SetExitKey(0);

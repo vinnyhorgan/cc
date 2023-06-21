@@ -13,7 +13,7 @@ function load()
 
     test = cc.data.newData()
 
-    test:append({104, 69, 442})
+    test:append({259, 69, 32})
 
     print(test:getSize())
 
