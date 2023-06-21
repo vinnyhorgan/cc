@@ -14,4 +14,5 @@ namespace timer
     float getDelta();
     float getFPS();
     float getTime();
+    void sleep(float seconds);
 }

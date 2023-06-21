@@ -1,5 +1,8 @@
 #include "timer.h"
 
+#include <chrono>
+#include <thread>
+
 namespace timer
 {
     void registerTimerAPI(sol::state& lua)
@@ -9,6 +12,7 @@ namespace timer
         timer["getDelta"] = &getDelta;
         timer["getFPS"] = &getFPS;
         timer["getTime"] = &getTime;
+        timer["sleep"] = &sleep;
 
         lua["cc"]["timer"] = timer;
     }
@@ -26,5 +30,10 @@ namespace timer
     float getTime()
     {
         return GetTime();
+    }
+
+    void sleep(float seconds)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1000)));
     }
 }
