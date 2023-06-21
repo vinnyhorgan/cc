@@ -12,6 +12,7 @@
 #include "graphics.h"
 #include "keyboard.h"
 #include "networking.h"
+#include "mouse.h"
 
 // lua classic library
 std::string classic = R"(
@@ -218,6 +219,7 @@ int main()
     graphics::registerGraphicsAPI(lua);
     keyboard::registerKeyboardAPI(lua);
     networking::registerNetworkingAPI(lua);
+    mouse::registerMouseAPI(lua);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
