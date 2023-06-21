@@ -1,5 +1,6 @@
 #include "math.h"
 
+#include <raylib.h>
 #include <FastNoiseLite.h>
 
 namespace math
