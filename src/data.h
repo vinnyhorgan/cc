@@ -29,4 +29,6 @@ namespace data
     // API
     Data newData();
     void printTable(sol::table table);
+
+    // All compression and encoding functions to add
 }

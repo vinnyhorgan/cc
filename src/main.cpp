@@ -20,6 +20,8 @@
 #include "data.h"
 #include "gamepad.h"
 #include "audio.h"
+#include "event.h"
+#include "math.h"
 
 // lua classic library
 std::string classic = R"(
@@ -234,6 +236,8 @@ int main()
     data::registerDataAPI(lua);
     gamepad::registerGamepadAPI(lua);
     audio::registerAudioAPI(lua);
+    event::registerEventAPI(lua);
+    math::registerMathAPI(lua);
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
@@ -254,7 +258,7 @@ int main()
         error_message = err.what();
     }
 
-    while (!WindowShouldClose())
+    while (!event::shouldQuit())
     {
         if (error)
         {
