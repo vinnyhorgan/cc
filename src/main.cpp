@@ -19,6 +19,7 @@
 #include "filesystem.h"
 #include "data.h"
 #include "gamepad.h"
+#include "audio.h"
 
 // lua classic library
 std::string classic = R"(
@@ -232,6 +233,7 @@ int main()
     filesystem::registerFilesystemAPI(lua);
     data::registerDataAPI(lua);
     gamepad::registerGamepadAPI(lua);
+    audio::registerAudioAPI(lua);
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");

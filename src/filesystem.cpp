@@ -166,7 +166,7 @@ namespace filesystem
 
     bool isPathFile(std::string path)
     {
-        return IsFileDropped();
+        return IsPathFile(path.c_str());
     }
 
     sol::table getDirectoryFiles(std::string path, sol::this_state state)
