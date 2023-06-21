@@ -13,6 +13,11 @@
 #include "keyboard.h"
 #include "networking.h"
 #include "mouse.h"
+#include "timer.h"
+#include "window.h"
+#include "system.h"
+#include "filesystem.h"
+#include "data.h"
 
 // lua classic library
 std::string classic = R"(
@@ -220,6 +225,11 @@ int main()
     keyboard::registerKeyboardAPI(lua);
     networking::registerNetworkingAPI(lua);
     mouse::registerMouseAPI(lua);
+    timer::registerTimerAPI(lua);
+    window::registerWindowAPI(lua);
+    systemc::registerSystemAPI(lua);
+    filesystem::registerFilesystemAPI(lua);
+    data::registerDataAPI(lua);
 
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");

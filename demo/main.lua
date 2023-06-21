@@ -10,6 +10,14 @@ function load()
     canvas = cc.graphics.newCanvas(200, 200)
 
     cc.graphics.setFont(roboto)
+
+    test = cc.data.newData()
+
+    test:append({104, 69, 442})
+
+    print(test:getSize())
+
+    cc.data.printTable(test:getData())
 end
 
 function update(dt)
