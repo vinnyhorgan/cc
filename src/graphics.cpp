@@ -478,19 +478,27 @@ namespace graphics
         graphics["setFont"] = &setFont;
         graphics["setShader"] = sol::overload(sol::resolve<void(Shaderc)>(&setShader), sol::resolve<void()>(&setShader));
         graphics["setCamera"] = sol::overload(sol::resolve<void(Camerac)>(&setCamera), sol::resolve<void()>(&setCamera));
+        graphics["fade"] = fade;
 
         lua["cc"]["graphics"] = graphics;
     }
 
-    void circle(DrawMode mode, int x, int y, float radius)
+    std::tuple<int, int, int, int> fade(int r, int g, int b, float alpha)
+    {
+        Color faded = Fade({(unsigned char)r, (unsigned char)g, (unsigned char)b, 255}, alpha);
+
+        return std::make_tuple(faded.r, faded.g, faded.b, faded.a);
+    }
+
+    void circle(DrawMode mode, float x, float y, float radius)
     {
         if (mode == DrawMode::Fill)
         {
-            DrawCircle(x, y, radius, color);
+            DrawCircle((int)x, (int)y, radius, color);
         }
         else if (mode == DrawMode::Line)
         {
-            DrawCircleLines(x, y, radius, color);
+            DrawCircleLines((int)x, (int)y, radius, color);
         }
     }
 

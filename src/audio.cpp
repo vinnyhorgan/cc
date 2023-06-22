@@ -38,6 +38,8 @@ namespace audio
         {
             return music.stream.channels;
         }
+
+        return 0;
     }
 
     int Source::getSampleRate()
@@ -50,6 +52,8 @@ namespace audio
         {
             return music.stream.sampleRate;
         }
+
+        return 0;
     }
 
     int Source::getSampleSize()
@@ -62,6 +66,8 @@ namespace audio
         {
             return music.stream.sampleSize;
         }
+
+        return 0;
     }
 
     int Source::getSampleCount()
@@ -74,6 +80,8 @@ namespace audio
         {
             return music.frameCount;
         }
+
+        return 0;
     }
 
     float Source::getPitch()
@@ -101,6 +109,8 @@ namespace audio
         {
             return GetMusicTimeLength(music);
         }
+
+        return 0.0f;
     }
 
     bool Source::isPlaying()
@@ -113,6 +123,8 @@ namespace audio
         {
             return IsMusicStreamPlaying(music);
         }
+
+        return false;
     }
 
     bool Source::isLooping()
@@ -315,7 +327,7 @@ namespace audio
 
     void stopAllSources()
     {
-        for (int i = 0; i < sources.size(); i++)
+        for (int i = 0; i < (int)sources.size(); i++)
         {
             sources[i].stop();
         }

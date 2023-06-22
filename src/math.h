@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sol/sol.hpp>
+#include <raylib.h>
 
 namespace math
 {
@@ -74,7 +75,6 @@ namespace math
 
     // Utility
     sol::table registerMathAPI(sol::state& lua);
-    void update();
 
     // API
     float clamp(float value, float min, float max);
@@ -95,7 +95,7 @@ namespace math
     void setNoiseType(NoiseType type);
     void setNoiseSeed(int seed);
     void setRandomSeed(int seed);
-    float tween(float start, float end, int durationInFrames);
-    float tween(float start, float end, int durationInFrames, TweenType type);
+    float tween(float timer, float start, float end, float durationInSeconds);
+    float tween(float timer, float start, float end, float durationInSeconds, TweenType type);
     float wrap(float value, float min, float max);
 }

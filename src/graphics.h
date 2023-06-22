@@ -162,7 +162,7 @@ namespace graphics
     // API
 
     // Drawing
-    void circle(DrawMode mode, int x, int y, float radius);
+    void circle(DrawMode mode, float x, float y, float radius);
     void clear(int r, int g, int b);
     void clear(int r, int g, int b, int a);
     void draw(Image image, int x, int y);
@@ -178,6 +178,7 @@ namespace graphics
     void rectangle(DrawMode mode, int x, int y, int width, int height);
     void rectangle(DrawMode mode, int x, int y, int width, int height, float rotation);
     void triangle(DrawMode mode, int x1, int y1, int x2, int y2, int x3, int y3);
+    std::tuple<int, int, int, int> fade(int r, int g, int b, float alpha);
 
     // Object creation
     void captureScreenshot(std::string filename);

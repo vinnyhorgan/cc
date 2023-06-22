@@ -1,6 +1,5 @@
 #include "math.h"
 
-#include <raylib.h>
 #include <raymath.h>
 #include <reasings.h>
 #include <FastNoiseLite.h>
@@ -12,7 +11,6 @@ math::NoiseType noiseType = math::NoiseType::OpenSimplex;
 int noiseSeed = 1337;
 float noiseFrequency = 0.01f;
 int randomSeed = 0;
-int framesCounter = 0;
 
 namespace math
 {
@@ -178,15 +176,10 @@ namespace math
         math["setNoiseType"] = setNoiseType;
         math["setNoiseSeed"] = setNoiseSeed;
         math["setRandomSeed"] = setRandomSeed;
-        math["tween"] = sol::overload(sol::resolve<float(float, float, int)>(tween), sol::resolve<float(float, float, int, TweenType)>(tween));
+        math["tween"] = sol::overload(sol::resolve<float(float, float, float, float)>(tween), sol::resolve<float(float, float, float, float, TweenType)>(tween));
         math["wrap"] = wrap;
 
         return math;
-    }
-
-    void update()
-    {
-        framesCounter++;
     }
 
     // API
@@ -283,102 +276,104 @@ namespace math
         SetRandomSeed(seed);
     }
 
-    float tween(float start, float end, int durationInFrames)
+    float tween(float timer, float start, float end, float durationInSeconds)
     {
-        return EaseLinearNone(framesCounter, start, end - start, durationInFrames);
+        return EaseLinearNone(timer, start, end - start, durationInSeconds);
     }
 
-    float tween(float start, float end, int durationInFrames, TweenType type)
+    float tween(float timer, float start, float end, float durationInSeconds, TweenType type)
     {
         switch (type)
         {
             case TweenType::Linear:
-                return EaseLinearNone(framesCounter, start, end - start, durationInFrames);
+                return EaseLinearNone(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::LinearIn:
-                return EaseLinearIn(framesCounter, start, end - start, durationInFrames);
+                return EaseLinearIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::LinearOut:
-                return EaseLinearOut(framesCounter, start, end - start, durationInFrames);
+                return EaseLinearOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::LinearInOut:
-                return EaseLinearInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseLinearInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::SineIn:
-                return EaseSineIn(framesCounter, start, end - start, durationInFrames);
+                return EaseSineIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::SineOut:
-                return EaseSineOut(framesCounter, start, end - start, durationInFrames);
+                return EaseSineOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::SineInOut:
-                return EaseSineInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseSineInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CircularIn:
-                return EaseCircIn(framesCounter, start, end - start, durationInFrames);
+                return EaseCircIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CircularOut:
-                return EaseCircOut(framesCounter, start, end - start, durationInFrames);
+                return EaseCircOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CircularInOut:
-                return EaseCircInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseCircInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CubicIn:
-                return EaseCubicIn(framesCounter, start, end - start, durationInFrames);
+                return EaseCubicIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CubicOut:
-                return EaseCubicOut(framesCounter, start, end - start, durationInFrames);
+                return EaseCubicOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::CubicInOut:
-                return EaseCubicInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseCubicInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::QuadraticIn:
-                return EaseQuadIn(framesCounter, start, end - start, durationInFrames);
+                return EaseQuadIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::QuadraticOut:
-                return EaseQuadOut(framesCounter, start, end - start, durationInFrames);
+                return EaseQuadOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::QuadraticInOut:
-                return EaseQuadInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseQuadInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ExponentialIn:
-                return EaseExpoIn(framesCounter, start, end - start, durationInFrames);
+                return EaseExpoIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ExponentialOut:
-                return EaseExpoOut(framesCounter, start, end - start, durationInFrames);
+                return EaseExpoOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ExponentialInOut:
-                return EaseExpoInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseExpoInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BackIn:
-                return EaseBackIn(framesCounter, start, end - start, durationInFrames);
+                return EaseBackIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BackOut:
-                return EaseBackOut(framesCounter, start, end - start, durationInFrames);
+                return EaseBackOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BackInOut:
-                return EaseBackInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseBackInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BounceIn:
-                return EaseBounceIn(framesCounter, start, end - start, durationInFrames);
+                return EaseBounceIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BounceOut:
-                return EaseBounceOut(framesCounter, start, end - start, durationInFrames);
+                return EaseBounceOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::BounceInOut:
-                return EaseBounceInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseBounceInOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ElasticIn:
-                return EaseElasticIn(framesCounter, start, end - start, durationInFrames);
+                return EaseElasticIn(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ElasticOut:
-                return EaseElasticOut(framesCounter, start, end - start, durationInFrames);
+                return EaseElasticOut(timer, start, end - start, durationInSeconds);
                 break;
             case TweenType::ElasticInOut:
-                return EaseElasticInOut(framesCounter, start, end - start, durationInFrames);
+                return EaseElasticInOut(timer, start, end - start, durationInSeconds);
                 break;
             default:
                 break;
         }
+
+        return 0;
     }
 
     float wrap(float value, float min, float max)
