@@ -65,12 +65,15 @@ namespace math
         float distance(Vector other);
         float dot(Vector other);
         float angle(Vector other);
+
+        // Utility
+        Vector2 toVector2();
     };
 
     // Functions
 
     // Utility
-    void registerMathAPI(sol::state& lua);
+    sol::table registerMathAPI(sol::state& lua);
     void update();
 
     // API
@@ -79,8 +82,6 @@ namespace math
     NoiseType getNoiseType();
     int getNoiseSeed();
     int getRandomSeed();
-    bool isConvex(sol::table vertices);
-    bool isConvex(sol::variadic_args vertices);
     float lerp(float start, float end, float amount);
     Vector newVector2();
     float noise(float x, float y);
@@ -94,8 +95,6 @@ namespace math
     void setNoiseType(NoiseType type);
     void setNoiseSeed(int seed);
     void setRandomSeed(int seed);
-    sol::table triangulate(sol::this_state state, sol::table polygon);
-    sol::table triangulate(sol::this_state state, sol::variadic_args polygon);
     float tween(float start, float end, int durationInFrames);
     float tween(float start, float end, int durationInFrames, TweenType type);
     float wrap(float value, float min, float max);

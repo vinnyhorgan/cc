@@ -237,7 +237,7 @@ int main()
     gamepad::registerGamepadAPI(lua);
     audio::registerAudioAPI(lua);
     event::registerEventAPI(lua);
-    math::registerMathAPI(lua);
+    lua["cc"]["math"] = math::registerMathAPI(lua);
 
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(800, 600, "Creative Coding by Vinny Horgan");
