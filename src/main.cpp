@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 #include <raylib.h>
+#include <raymath.h>
 #include <rlImGui.h>
 
 #include <string>
@@ -22,6 +23,9 @@
 #include "audio.h"
 #include "event.h"
 #include "math.h"
+
+#define MAX(a, b) ((a)>(b)? (a) : (b))
+#define MIN(a, b) ((a)<(b)? (a) : (b))
 
 // lua classic library
 std::string classic = R"(
@@ -80,89 +84,122 @@ std::string luoToLua(const std::string& code) {
     std::string result = code;
 
     size_t pos = result.find("import(\"");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         size_t endpos = result.find("\")", pos + 8);
-        if (endpos != std::string::npos) {
+
+        if (endpos != std::string::npos)
+        {
             std::string filename = result.substr(pos + 8, endpos - pos - 8);
 
             std::string file_contents = LoadFileText(filename.c_str());
             result.replace(pos, endpos - pos + 2, file_contents);
         }
+
         pos = result.find("import(\"", pos + 1);
     }
 
     // Replace not equals
     pos = result.find("!=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         result.replace(pos, 2, "~=");
         pos = result.find("!=", pos + 2);
     }
 
     // Replace +=, -=, *=, /=, %=
     pos = result.find("+=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         // Find the nearest newline character before the += operator
         size_t lhs_start = result.rfind('\n', pos);
-        if (lhs_start == std::string::npos) {
+
+        if (lhs_start == std::string::npos)
+        {
             lhs_start = 0;
-        } else {
+        }
+        else
+        {
             // Include the newline character in the substring
             lhs_start += 1;
         }
+
         // Replace the += operator with = lhs + rhs
         result.replace(pos, 2, " = " + result.substr(lhs_start, pos - lhs_start) + " + ");
         pos = result.find("+=", pos + 2);
     }
 
     pos = result.find("-=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         size_t lhs_start = result.rfind('\n', pos);
-        if (lhs_start == std::string::npos) {
+
+        if (lhs_start == std::string::npos)
+        {
             lhs_start = 0;
-        } else {
+        }
+        else
+        {
             lhs_start += 1;
         }
+
         result.replace(pos, 2, " = " + result.substr(lhs_start, pos - lhs_start) + " - ");
         pos = result.find("-=", pos + 2);
     }
 
     pos = result.find("*=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         size_t lhs_start = result.rfind('\n', pos);
-        if (lhs_start == std::string::npos) {
+
+        if (lhs_start == std::string::npos)
+        {
             lhs_start = 0;
-        } else {
+        }
+        else
+        {
             lhs_start += 1;
         }
+
         result.replace(pos, 2, " = " + result.substr(lhs_start, pos - lhs_start) + " * ");
         pos = result.find("*=", pos + 2);
     }
 
     pos = result.find("/=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         size_t lhs_start = result.rfind('\n', pos);
-        if (lhs_start == std::string::npos) {
+
+        if (lhs_start == std::string::npos)
+        {
             lhs_start = 0;
-        } else {
+        }
+        else
+        {
             lhs_start += 1;
         }
+
         result.replace(pos, 2, " = " + result.substr(lhs_start, pos - lhs_start) + " / ");
         pos = result.find("/=", pos + 2);
     }
 
     pos = result.find("%=");
-    while (pos != std::string::npos) {
+    while (pos != std::string::npos)
+    {
         size_t lhs_start = result.rfind('\n', pos);
-        if (lhs_start == std::string::npos) {
+
+        if (lhs_start == std::string::npos)
+        {
             lhs_start = 0;
-        } else {
+        }
+        else
+        {
             lhs_start += 1;
         }
+
         result.replace(pos, 2, " = " + result.substr(lhs_start, pos - lhs_start) + " % ");
         pos = result.find("%=", pos + 2);
     }
-
-    // TODO Replace array indexing
 
     return result;
 }
@@ -210,7 +247,8 @@ int main()
 
     sol::protected_function_result result = lua.safe_script(transpiled, sol::script_pass_on_error);
 
-    if (!result.valid()) {
+    if (!result.valid())
+    {
         sol::error err = result;
         spdlog::error("Error loading script: {}", err.what());
 
@@ -239,10 +277,17 @@ int main()
     event::registerEventAPI(lua);
     lua["cc"]["math"] = math::registerMathAPI(lua);
 
-    SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(800, 600, "Creative Coding by Vinny Horgan");
+    int defaultWidth = 800;
+    int defaultHeight = 600;
+
+    SetConfigFlags(FLAG_MSAA_4X_HINT | FLAG_WINDOW_RESIZABLE);
+    InitWindow(defaultWidth, defaultHeight, "Creative Coding by Vinny Horgan");
+    SetWindowMinSize(defaultWidth / 2, defaultHeight / 2);
     SetTargetFPS(60);
     SetExitKey(0);
+
+    RenderTexture2D target = LoadRenderTexture(defaultWidth, defaultHeight);
+    SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
 
     InitAudioDevice();
 
@@ -250,7 +295,8 @@ int main()
 
     result = load();
 
-    if (!result.valid()) {
+    if (!result.valid())
+    {
         sol::error err = result;
         spdlog::error("Error loading script: {}", err.what());
 
@@ -260,6 +306,8 @@ int main()
 
     while (!event::shouldQuit())
     {
+        float scale = MIN((float)GetScreenWidth()/defaultWidth, (float)GetScreenHeight()/defaultHeight);
+
         if (error)
         {
             if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -268,17 +316,27 @@ int main()
                 copied = true;
             }
 
+            BeginTextureMode(target);
+
+                ClearBackground(SKYBLUE);
+
+                DrawText("Error: (click to copy to clipboard)", 10, 10, 20, WHITE);
+                DrawText(error_message.c_str(), 10, 40, 20, WHITE);
+
+                if (copied)
+                {
+                    DrawText("Copied to clipboard!", 10, GetScreenHeight() - 30, 20, WHITE);
+                }
+
+            EndTextureMode();
+
             BeginDrawing();
 
-            ClearBackground(SKYBLUE);
+                ClearBackground(BLACK);
 
-            DrawText("Error: (click to copy to clipboard)", 10, 10, 20, WHITE);
-            DrawText(error_message.c_str(), 10, 40, 20, WHITE);
-
-            if (copied)
-            {
-                DrawText("Copied to clipboard!", 10, GetScreenHeight() - 30, 20, WHITE);
-            }
+                DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
+                            (Rectangle){ (GetScreenWidth() - ((float)defaultWidth*scale))*0.5f, (GetScreenHeight() - ((float)defaultHeight*scale))*0.5f,
+                            (float)defaultWidth*scale, (float)defaultHeight*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
             EndDrawing();
         }
@@ -286,7 +344,8 @@ int main()
         {
             result = update(GetFrameTime());
 
-            if (!result.valid()) {
+            if (!result.valid())
+            {
                 sol::error err = result;
                 spdlog::error("Error updating script: {}", err.what());
 
@@ -294,29 +353,42 @@ int main()
                 error_message = err.what();
             }
 
+            BeginTextureMode(target);
+
+                ClearBackground(BLACK);
+
+                result = draw();
+
+                if (!result.valid())
+                {
+                    sol::error err = result;
+                    spdlog::error("Error drawing script: {}", err.what());
+
+                    error = true;
+                    error_message = err.what();
+                }
+
+            EndTextureMode();
+
             BeginDrawing();
 
-            ClearBackground(BLACK);
+                ClearBackground(BLACK);
 
-            rlImGuiBegin();
+                DrawTexturePro(target.texture, (Rectangle){ 0.0f, 0.0f, (float)target.texture.width, (float)-target.texture.height },
+                            (Rectangle){ (GetScreenWidth() - ((float)defaultWidth*scale))*0.5f, (GetScreenHeight() - ((float)defaultHeight*scale))*0.5f,
+                            (float)defaultWidth*scale, (float)defaultHeight*scale }, (Vector2){ 0, 0 }, 0.0f, WHITE);
 
-            result = draw();
+                rlImGuiBegin();
 
-            if (!result.valid()) {
-                sol::error err = result;
-                spdlog::error("Error drawing script: {}", err.what());
+                gui::updateFileDialog(lua);
 
-                error = true;
-                error_message = err.what();
-            }
-
-            gui::updateFileDialog(lua);
-
-            rlImGuiEnd();
+                rlImGuiEnd();
 
             EndDrawing();
         }
     }
+
+    UnloadRenderTexture(target);
 
     rlImGuiShutdown();
 

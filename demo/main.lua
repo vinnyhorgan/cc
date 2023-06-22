@@ -14,7 +14,7 @@ function update(dt)
     timer += dt
 
     if state == 0 then
-        ballPositionX = cc.math.tween(timer, -100, cc.window.getWidth() / 2, 2, TweenType.ElasticOut)
+        ballPositionX = cc.math.tween(timer, -100, 400, 2, TweenType.ElasticOut)
 
         if timer > 2 then
             timer = 0
@@ -29,7 +29,6 @@ function update(dt)
         end
     elseif state == 2 then
         ballAlpha = cc.math.tween(timer, 0, 1, 3.3, TweenType.CubicOut)
-        print(ballAlpha)
 
         if timer > 3.3 then
             timer = 0
@@ -58,7 +57,7 @@ function draw()
 
     if state >= 2 then
         cc.graphics.setColor(0, 255, 0)
-        cc.graphics.rectangle(DrawMode.Fill, 0, 0, cc.window.getWidth(), cc.window.getHeight())
+        cc.graphics.rectangle(DrawMode.Fill, 0, 0, 800, 600)
         cc.graphics.setColor(0, 0, 0)
     end
 
@@ -67,6 +66,6 @@ function draw()
     end
 
     cc.graphics.setColor(r, g, b, a)
-    cc.graphics.circle(DrawMode.Fill, ballPositionX, cc.window.getHeight() / 2, ballRadius)
+    cc.graphics.circle(DrawMode.Fill, ballPositionX, 300, ballRadius)
     cc.graphics.setColor(0, 0, 0)
 end
